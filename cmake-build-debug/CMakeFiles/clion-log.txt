@@ -1,0 +1,7 @@
+"F:\JetBrains\CLion 2021.2.3\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEPENDS_USE_COMPILER=FALSE -G "CodeBlocks - MinGW Makefiles" F:\HpcProjects\Projet_HPC
+-- Found OpenMP_C: -fopenmp (found version "4.5") 
+-- Found OpenMP: TRUE (found version "4.5")  
+OPENMP FOUND
+-- Configuring done
+-- Generating done
+-- Build files have been written to: F:/HpcProjects/Projet_HPC/cmake-build-debug
