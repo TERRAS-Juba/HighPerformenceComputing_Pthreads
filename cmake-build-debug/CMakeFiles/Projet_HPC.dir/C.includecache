@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-F:/HpcProjects/Projet_HPC/main.c
+C:/Users/TERRASJuba/Desktop/PROJET_HPC_PTHREADS/main.c
 math.h
 -
 stdio.h
@@ -14,5 +14,7 @@ stdio.h
 stdlib.h
 -
 time.h
+-
+pthread.h
 -
 
