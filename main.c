@@ -40,6 +40,7 @@ void r8mat_uniform_ab ( int m, int n, double a, double b, int *seed, double r[] 
 void timestamp ( );
 void update ( int np, int nd, double pos[], double vel[], double f[],
               double acc[], double mass, double dt );
+void *update_parallele ( void *t );
 // --------------------------------------------
 // 3)- Programme principale
 // --------------------------------------------
@@ -169,6 +170,13 @@ int main ( int argc, char *argv[] )
                     pthread_join(threads[i], NULL);
                 }
             }
+        }else{
+            for (int i = 0; i < NUM_THREADS; ++i) {
+                pthread_create(&threads[i], NULL, update_parallele, (void *) &threads_structs[i]);
+                for (i = 0; i < NUM_THREADS; ++i) {
+                    pthread_join(threads[i], NULL);
+                }
+            }
         }
     }
     // -----------------------------------------------------------
@@ -185,7 +193,7 @@ int main ( int argc, char *argv[] )
             update ( np, nd, pos, vel, force, acc, mass, dt );
         }
 
-        compute ( np, nd, pos, vel, mass, force, &potential, &kinetic );
+        //compute ( np, nd, pos, vel, mass, force, &potential, &kinetic );
 
         if ( step == 0 )
         {
@@ -209,13 +217,13 @@ int main ( int argc, char *argv[] )
     printf ( "  Elapsed cpu time: %f seconds.\n", ctime );
     for (int i = 0; i < np; ++i) {
         for (int j = 0; j < nd; ++j) {
-            printf("%f |",pos_parallele[j+i*nd]);
+            printf("%f |",acc_parallele[j+i*nd]);
         }
     }
     printf("\n-----------------------------------------------------------\n");
     for (int i = 0; i < np; ++i) {
         for (int j = 0; j < nd; ++j) {
-            printf("%f |",pos[j+i*nd]);
+            printf("%f |",acc[j+i*nd]);
         }
     }
     // -----------------------------------------------------------
@@ -473,3 +481,22 @@ void update ( int np, int nd, double pos[], double vel[], double f[],
 
     return;
 }
+/******************************************************************************/
+void *update_parallele ( void *t )
+{
+    struct thread_strcut *structure=(struct thread_strcut*)t;
+    int i;
+    int j;
+    double rmass;
+    rmass = 1.0 / mass;
+    for (j = structure->debut; j < structure->debut+structure->nb_iterations; j++) {
+        for (i = 0; i < structure->dimension; i++) {
+            structure->pos[i + j * structure->dimension] = structure->pos[i + j * structure->dimension] + structure->vel[i + j * structure->dimension] * dt + 0.5 * structure->acc[i + j * structure->dimension] * dt * dt;
+            structure-> vel[i + j * structure->dimension] = structure->vel[i + j * structure->dimension] + 0.5 * dt * (structure->force[i + j * structure->dimension] * rmass + structure->acc[i + j * structure->dimension]);
+            structure-> acc[i + j * structure->dimension] = structure->force[i + j * structure->dimension] * rmass;
+        }
+    }
+
+    pthread_exit(NULL);
+}
+/******************************************************************************/
